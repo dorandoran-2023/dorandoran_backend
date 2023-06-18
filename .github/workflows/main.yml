@@ -88,7 +88,7 @@ jobs:
     - name: Upload to AWS S3
       run: |
         aws deploy push \
-          --application-name ${{ env.APPLICATION_NAME-deploy }} \
+          --application-name ${{ env.APPLICATION_NAME }}-deploy \
           --ignore-hidden-files \
           --s3-location s3://$S3_BUCKET_NAME/deploy/$APPLICATION_NAME-server.zip \
           --source .
@@ -96,7 +96,7 @@ jobs:
     - name: Deploy to AWS EC2 from S3
       run: |
         aws deploy create-deployment \
-          --application-name ${{ env.APPLICATION_NAME-deploy }} \
+          --application-name ${{ env.APPLICATION_NAME }}-deploy \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }} \
           --file-exists-behavior OVERWRITE \
