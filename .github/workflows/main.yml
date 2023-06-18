@@ -17,7 +17,7 @@ env:
   S3_BUCKET_NAME: dorandoran-s3
   AWS_REGION: ap-northeast-2
   APPLICATION_NAME: dorandoran
-  DEPLOYMENT_GROUP_NAME: dorandoran-group
+  DEPLOYMENT_GROUP_NAME: dorandoran-deploy-group
 
 permissions:
   contents: read
