@@ -88,7 +88,7 @@ jobs:
     - name: Upload to AWS S3
       run: |
         aws deploy push \
-          --application-name ${{ env.APPLICATION_NAME }} \
+          --application-name ${{ env.APPLICATION_NAME-deploy }} \
           --ignore-hidden-files \
           --s3-location s3://$S3_BUCKET_NAME/deploy/$APPLICATION_NAME-server.zip \
           --source .
