@@ -1,0 +1,57 @@
+package com.dorandoran.dorandoran.infra.jwt;
+
+import java.security.Key;
+import java.util.Date;
+import java.util.Map;
+
+import com.dorandoran.dorandoran.config.jwt.JwtProperties;
+import com.dorandoran.dorandoran.core.user.application.TokenService;
+
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+
+public class JwtTokenService implements TokenService {
+	private final JwtParser jwtParser;
+	private long accessValidity;
+	private long refreshValidity;
+	private Key secretKey;
+
+	public JwtTokenService(JwtProperties properties) {
+		this.accessValidity = properties.getAccessValidity();
+		this.refreshValidity = properties.getRefreshValidity();
+		this.secretKey = Keys.hmacShaKeyFor(properties.getSecret().getBytes());
+		this.jwtParser = Jwts.parserBuilder().setSigningKey(secretKey).build();
+	}
+
+	@Override
+	public Map<String, Object> parseClaim(String token) {
+		return jwtParser
+			.parseClaimsJws(token)
+			.getBody();
+	}
+
+	@Override
+	public String createRefreshToken() {
+		long currentTime = (new Date()).getTime();
+		final Date refreshTokenExpiresIn = new Date(currentTime + refreshValidity);
+
+		return Jwts.builder()
+			.setSubject("RefreshToken")
+			.setExpiration(refreshTokenExpiresIn)
+			.signWith(secretKey, SignatureAlgorithm.HS512)
+			.compact();
+	}
+
+	@Override
+	public boolean isExpired(String token) {
+		try {
+			parseClaim(token);
+		} catch (ExpiredJwtException exception) {
+			return true;
+		}
+		return false;
+	}
+}
