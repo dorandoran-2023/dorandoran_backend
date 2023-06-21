@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import com.dorandoran.dorandoran.core.user.application.TokenService;
 import com.dorandoran.dorandoran.infra.jwt.JwtTokenService;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class JwtConfiguration {
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter(TokenService service) {

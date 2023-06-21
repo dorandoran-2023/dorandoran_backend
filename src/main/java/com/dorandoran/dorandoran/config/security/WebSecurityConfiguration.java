@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class WebSecurityConfiguration {
 	static {
 		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
