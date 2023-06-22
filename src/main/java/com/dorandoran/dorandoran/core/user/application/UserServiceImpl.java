@@ -35,7 +35,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void authenticatePhoneNumber(PhoneNumberAuthenticationRequest request) {
 		// compare certification code
-		PhoneNumberAuthentication authentication = phoneNumberAuthenticationRepository.findById(request.getPhoneNumber())
+		String phoneNumber = request.getPhoneNumber().replace("-", "").trim();
+		PhoneNumberAuthentication authentication = phoneNumberAuthenticationRepository.findById(phoneNumber)
 			.orElseThrow(() -> new BadRequestException("phoneNumberAuthentication-failed.code-none"));
 
 		if (authentication.isAuthenticated()) {
