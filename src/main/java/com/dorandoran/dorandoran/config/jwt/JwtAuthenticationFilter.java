@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.dorandoran.dorandoran.core.common.SecurityUser;
 import com.dorandoran.dorandoran.core.user.application.TokenService;
-import com.dorandoran.dorandoran.global.model.SecurityUser;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
