@@ -1,5 +1,6 @@
 package com.dorandoran.dorandoran.global.util;
 
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 import org.springframework.data.redis.serializer.SerializationException;
@@ -31,6 +32,12 @@ public final class Preconditions {
 	public static void checkLength(int minLength, int maxLength, String value, String type) {
 		if (value.length() < minLength || value.length() > maxLength) {
 			throw new InputValidationException("length", type, minLength, maxLength);
+		}
+	}
+
+	public static void checkExtension(String value, Collection<String> collection) {
+		if (!collection.contains(value)) {
+			throw new InputValidationException("extension", value);
 		}
 	}
 }
