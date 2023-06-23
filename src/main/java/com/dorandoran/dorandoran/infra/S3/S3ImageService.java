@@ -10,8 +10,10 @@ import com.dorandoran.dorandoran.core.image.application.ImageService;
 import com.dorandoran.dorandoran.core.image.dto.UploadImageDTO;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
+@Component
 public class S3ImageService implements ImageService {
 
     private final AmazonS3 amazonS3;
