@@ -6,7 +6,9 @@ import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.*;
 
 import com.dorandoran.dorandoran.core.common.BaseEntity;
+import com.dorandoran.dorandoran.core.user.domain.User;
 
+import com.sun.xml.bind.v2.TODO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +22,10 @@ public class Profile extends BaseEntity {
     @Column(updatable = false)
     private Long id;
 
+    @JoinColumn(name = "user_id")
+    @OneToOne
+    private User user;
+
     @Embedded
     private Nickname nickname;
 
@@ -27,6 +33,7 @@ public class Profile extends BaseEntity {
     private String bio;
 
     public Profile(Nickname nickname, String bio) {
+        // TODO. 프로필 생성 시 user 연결 필요
         checkNotNull(nickname, "Profile.nickname cannot be null");
         this.nickname = nickname;
         this.bio = bio;
