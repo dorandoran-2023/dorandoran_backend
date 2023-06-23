@@ -11,8 +11,11 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.dorandoran.dorandoran.global.error.ErrorResponse;
 import com.dorandoran.dorandoran.global.error.exception.DoranDoranRuntimeException;
+import com.dorandoran.dorandoran.global.error.exception.DoranDoranIOException;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
 
 @Slf4j
 @RestControllerAdvice
@@ -21,6 +24,23 @@ public class GlobalExceptionHandler {
 
 	public GlobalExceptionHandler(MessageSource messageSource) {
 		this.messageSourceAccessor = new MessageSourceAccessor(messageSource);
+	}
+
+	@ResponseStatus(INTERNAL_SERVER_ERROR)
+	@ExceptionHandler(DoranDoranIOException.class)
+	public ErrorResponse handleDoranDoranIOException(DoranDoranIOException exception) {
+		String type = exception.getClass().getSimpleName();
+		String message = messageSourceAccessor.getMessage(exception.getMessageKey(), exception.getParams());
+		return new ErrorResponse(INTERNAL_SERVER_ERROR, type, message);
+	}
+
+	@ResponseStatus(INTERNAL_SERVER_ERROR)
+	@ExceptionHandler(IOException.class)
+	public ErrorResponse handleIOException(Exception exception) {
+		log.info(exception.getMessage(), exception);
+		String type = exception.getClass().getSimpleName();
+		String message = exception.getMessage();
+		return new ErrorResponse(INTERNAL_SERVER_ERROR, type, message);
 	}
 
 	@ResponseStatus(BAD_REQUEST)
