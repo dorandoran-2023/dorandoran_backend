@@ -1,4 +1,4 @@
-package com.dorandoran.dorandoran.global.model;
+package com.dorandoran.dorandoran.core.common;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

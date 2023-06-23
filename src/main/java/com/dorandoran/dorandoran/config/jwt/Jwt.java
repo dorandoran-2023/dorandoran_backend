@@ -3,7 +3,7 @@ package com.dorandoran.dorandoran.config.jwt;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 
-import com.dorandoran.dorandoran.global.model.SecurityUser;
+import com.dorandoran.dorandoran.core.common.SecurityUser;
 
 public class Jwt extends AbstractAuthenticationToken {
 	private final Object principal;
