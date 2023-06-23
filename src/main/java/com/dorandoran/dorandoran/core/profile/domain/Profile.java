@@ -32,9 +32,9 @@ public class Profile extends BaseEntity {
     @Column(nullable = true)
     private String bio;
 
-    public Profile(Nickname nickname, String bio) {
-        // TODO. 프로필 생성 시 user 연결 필요
+    public Profile(User user, Nickname nickname, String bio) {
         checkNotNull(nickname, "Profile.nickname cannot be null");
+        this.user = user;
         this.nickname = nickname;
         this.bio = bio;
     }
