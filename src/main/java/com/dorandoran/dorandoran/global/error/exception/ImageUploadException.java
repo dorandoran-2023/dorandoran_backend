@@ -1,10 +1,10 @@
 package com.dorandoran.dorandoran.global.error.exception;
 
-public class ImageUploadException extends BadRequestException {
+public class ImageUploadException extends DoranDoranIOException {
 
-    private static final String MESSAGE_KEY = "image-upload";
+    protected static final String MESSAGE_KEY = "image-upload";
 
     public ImageUploadException(String detailKey, Object... params) {
-        super(detailKey + "." + detailKey, params);
+        super(MESSAGE_KEY + "." + detailKey, params);
     }
 }
