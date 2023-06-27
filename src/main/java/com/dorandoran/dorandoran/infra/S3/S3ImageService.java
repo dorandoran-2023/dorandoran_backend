@@ -6,7 +6,6 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
 import com.dorandoran.dorandoran.config.S3.S3Properties;
-import com.dorandoran.dorandoran.core.image.application.ImageService;
 import com.dorandoran.dorandoran.core.image.dto.UploadImageDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -14,12 +13,11 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class S3ImageService implements ImageService {
+public class S3ImageService {
 
     private final AmazonS3 amazonS3;
     private final S3Properties s3Properties;
 
-    @Override
     public String upload(UploadImageDTO image) {
 
         String objectKey = image.getImageType().toString() + "/" + image.getFilename();
@@ -31,7 +29,6 @@ public class S3ImageService implements ImageService {
         return amazonS3.getUrl(s3Properties.getBucket(), objectKey).toString();
     }
 
-    @Override
     public void delete(String imageName, String imageType) {
 
         String objectKey = imageType + "/" + imageName;

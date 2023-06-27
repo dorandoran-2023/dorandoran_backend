@@ -8,7 +8,6 @@ import javax.persistence.*;
 import com.dorandoran.dorandoran.core.common.BaseEntity;
 import com.dorandoran.dorandoran.core.user.domain.User;
 
-import com.sun.xml.bind.v2.TODO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,6 +34,11 @@ public class Profile extends BaseEntity {
     public Profile(User user, Nickname nickname, String bio) {
         checkNotNull(nickname, "Profile.nickname cannot be null");
         this.user = user;
+        this.nickname = nickname;
+        this.bio = bio;
+    }
+
+    public void update(Nickname nickname, String bio) {
         this.nickname = nickname;
         this.bio = bio;
     }

@@ -1,19 +1,26 @@
 package com.dorandoran.dorandoran.core.profile.application;
 
-import java.util.List;
+import static com.dorandoran.dorandoran.core.image.domain.ImageType.BACKGROUND;
+import static com.dorandoran.dorandoran.core.image.domain.ImageType.PROFILE;
+
+import java.util.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dorandoran.dorandoran.core.common.SecurityUser;
 import com.dorandoran.dorandoran.core.image.application.ImageService;
+import com.dorandoran.dorandoran.core.image.domain.BackgroundImage;
+import com.dorandoran.dorandoran.core.image.domain.ImageType;
+import com.dorandoran.dorandoran.core.image.domain.ProfileImage;
 import com.dorandoran.dorandoran.core.image.dto.UploadImageDTO;
+import com.dorandoran.dorandoran.core.profile.domain.Nickname;
 import com.dorandoran.dorandoran.core.profile.domain.Profile;
-import com.dorandoran.dorandoran.core.profile.dto.CreateProfileRequest;
-import com.dorandoran.dorandoran.core.profile.dto.CreateProfileResponse;
+import com.dorandoran.dorandoran.core.profile.dto.UpdateProfileRequest;
+import com.dorandoran.dorandoran.core.profile.dto.UpdateProfileResponse;
 import com.dorandoran.dorandoran.core.profile.repository.ProfileRepository;
-import com.dorandoran.dorandoran.core.user.application.UserService;
-import com.dorandoran.dorandoran.core.user.domain.User;
+import com.dorandoran.dorandoran.global.error.exception.BadRequestException;
+import com.dorandoran.dorandoran.global.error.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,33 +31,56 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
     private final ImageService imageService;
-    private final UserService userService;
 
     @Override
     @Transactional
-    public CreateProfileResponse createProfile(SecurityUser securityUser, CreateProfileRequest request) {
+    public UpdateProfileResponse updateProfile(SecurityUser securityUser, UpdateProfileRequest request) {
 
         // get User from securityUser
-        // TODO: getUserById method
-        User user = userService.getUserById(securityUser.getUserId());
+        long profileId = securityUser.getProfileId();
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new NotFoundException("profile", profileId));
 
-        // save profile and set images
-        Profile profile = new Profile(user, request.getNickname(), request.getBio());
-        profileRepository.save(profile);
-        List<String> images = setImages(profile, request);
+        // update profile
+        Nickname nickname = request.getNickname();
+        String bio = request.getBio();
+        if (!profileRepository.existsByNickname(nickname)) {
+            throw new BadRequestException("update-profile-failed.nickname.duplicated", nickname);
+        }
+        profile.update(nickname, bio);
 
-        // return response
-        return CreateProfileResponse.ofEntity(profile, images);
+        // update and set images
+        Map<ImageType, String> imageUrls = uploadImages(profile, request);
+        imageService.updateImages(profile, imageUrls);
+
+        return UpdateProfileResponse.ofEntity(profile, imageUrls);
     }
 
-    private List<String> setImages(Profile profile, CreateProfileRequest request) {
+    private Map<ImageType, String> uploadImages(Profile profile, UpdateProfileRequest request) {
 
-        UploadImageDTO profileImage = request.getProfileImage();
-        UploadImageDTO backgroundImage = request.getBackgroundImage();
+        Optional<UploadImageDTO> profileImage = request.getProfileImage();
+        Optional<UploadImageDTO> backgroundImage = request.getBackgroundImage();
 
-        profileImage.setFilename(String.valueOf(profile.getId()));
-        backgroundImage.setFilename(String.valueOf(profile.getId()));
+        Map<ImageType, String> imageUrls = new HashMap<>();
 
-        return List.of(imageService.upload(profileImage), imageService.upload(backgroundImage));
+        profileImage.ifPresentOrElse(
+                image -> {
+                    image.setFilename(String.valueOf(profile.getId()));
+                    imageUrls.put(PROFILE, imageService.upload(image));
+                },
+                () -> {
+                    imageUrls.put(PROFILE, ProfileImage.DEFAULT_PROFILE_IMAGE);
+                });
+
+        backgroundImage.ifPresentOrElse(
+                image -> {
+                    image.setFilename(String.valueOf(profile.getId()));
+                    imageUrls.put(BACKGROUND, imageService.upload(image));
+                },
+                () -> {
+                    imageUrls.put(BACKGROUND, BackgroundImage.DEFAULT_BACKGROUND_IMAGE);
+                });
+
+        return imageUrls;
     }
 }

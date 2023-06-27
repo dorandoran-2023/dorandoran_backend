@@ -1,10 +1,10 @@
 package com.dorandoran.dorandoran.core.profile.application;
 
 import com.dorandoran.dorandoran.core.common.SecurityUser;
-import com.dorandoran.dorandoran.core.profile.dto.CreateProfileRequest;
-import com.dorandoran.dorandoran.core.profile.dto.CreateProfileResponse;
+import com.dorandoran.dorandoran.core.profile.dto.UpdateProfileRequest;
+import com.dorandoran.dorandoran.core.profile.dto.UpdateProfileResponse;
 
 public interface ProfileService {
 
-    public CreateProfileResponse createProfile(SecurityUser securityUser, CreateProfileRequest request);
+    public UpdateProfileResponse updateProfile(SecurityUser securityUser, UpdateProfileRequest request);
 }
