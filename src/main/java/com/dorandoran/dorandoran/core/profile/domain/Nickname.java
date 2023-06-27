@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class Nickname {
 
-    private static final Pattern NICKNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9가-힣]+$");
+    private static final Pattern NICKNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9가-힣-]+$");
 
     @Column(name = "nickname", unique = true, nullable = false)
     private String value;

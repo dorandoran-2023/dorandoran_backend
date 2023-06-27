@@ -5,6 +5,7 @@ import static com.dorandoran.dorandoran.core.image.domain.ImageType.PROFILE;
 
 import java.util.*;
 
+import com.dorandoran.dorandoran.core.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,20 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
     private final ImageService imageService;
+
+    @Override
+    @Transactional
+    public void createProfile(User user) {
+        // generate random nickname
+        String strNickname = "user-" + UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+        Nickname nickname = Nickname.of(strNickname);
+
+        // create profile with nickname
+        Profile profile = new Profile(user, nickname, null);
+
+        // save profile
+        profileRepository.save(profile);
+    }
 
     @Override
     @Transactional
