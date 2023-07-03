@@ -21,4 +21,8 @@ public abstract class Image {
 
     @Column(nullable = false)
     private String filename;
+
+    public void update(String url) {
+        this.url = url;
+    }
 }

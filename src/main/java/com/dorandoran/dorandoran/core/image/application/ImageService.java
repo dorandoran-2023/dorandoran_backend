@@ -1,10 +1,16 @@
 package com.dorandoran.dorandoran.core.image.application;
 
+import com.dorandoran.dorandoran.core.image.domain.ImageType;
 import com.dorandoran.dorandoran.core.image.dto.UploadImageDTO;
+import com.dorandoran.dorandoran.core.profile.domain.Profile;
+
+import java.util.Map;
 
 public interface ImageService {
 
-    public String upload(UploadImageDTO image);
+    String upload(UploadImageDTO image);
 
-    public void delete(String ImageName, String ImageType);
+    void delete(String imageName, String imageType);
+
+    void updateImages(Profile profile, Map<ImageType, String> imageUrls);
 }

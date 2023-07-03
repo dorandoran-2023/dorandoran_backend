@@ -1,17 +1,45 @@
 package com.dorandoran.dorandoran.core.profile.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import static com.dorandoran.dorandoran.global.util.Preconditions.checkNotNull;
+import static javax.persistence.GenerationType.IDENTITY;
 
-// profile 브랜치에서 구현 예정
+import javax.persistence.*;
+
+import com.dorandoran.dorandoran.core.common.BaseEntity;
+import com.dorandoran.dorandoran.core.user.domain.User;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
 @Entity
-public class Profile {
+public class Profile extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    @Column(updatable = false)
     private Long id;
 
-    public String getUserId() {
-        return "userId";
+    @JoinColumn(name = "user_id")
+    @OneToOne
+    private User user;
+
+    @Embedded
+    private Nickname nickname;
+
+    @Column(nullable = true)
+    private String bio;
+
+    public Profile(User user, Nickname nickname, String bio) {
+        checkNotNull(nickname, "Profile.nickname cannot be null");
+        this.user = user;
+        this.nickname = nickname;
+        this.bio = bio;
+    }
+
+    public void update(Nickname nickname, String bio) {
+        this.nickname = nickname;
+        this.bio = bio;
     }
 }

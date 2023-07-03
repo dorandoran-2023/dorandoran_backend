@@ -1,5 +1,6 @@
 package com.dorandoran.dorandoran.core.user.application;
 
+import com.dorandoran.dorandoran.core.profile.application.ProfileService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class UserServiceImpl implements UserService {
 	private final SmsService smsService;
+	private final ProfileService profileService;
 	private final PhoneNumberAuthenticationRepository phoneNumberAuthenticationRepository;
 	private final UserRepository userRepository;
 
@@ -87,6 +89,7 @@ public class UserServiceImpl implements UserService {
 
 		// save user
 		User savedUser = userRepository.save(user);
+		profileService.createProfile(user);
 
 		// return
 		return AddUserResponse.ofEntity(savedUser);
