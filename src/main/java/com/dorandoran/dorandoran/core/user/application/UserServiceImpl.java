@@ -1,21 +1,27 @@
 package com.dorandoran.dorandoran.core.user.application;
 
-import com.dorandoran.dorandoran.core.profile.application.ProfileService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dorandoran.dorandoran.core.profile.application.ProfileService;
+import com.dorandoran.dorandoran.core.profile.repository.ProfileRepository;
 import com.dorandoran.dorandoran.core.user.domain.PhoneNumberAuthentication;
+import com.dorandoran.dorandoran.core.user.domain.RefreshToken;
 import com.dorandoran.dorandoran.core.user.domain.User;
 import com.dorandoran.dorandoran.core.user.dto.AddUserRequest;
 import com.dorandoran.dorandoran.core.user.dto.AddUserResponse;
 import com.dorandoran.dorandoran.core.user.dto.EmailDuplicatedCheckRequest;
 import com.dorandoran.dorandoran.core.user.dto.EmailDuplicatedCheckResponse;
+import com.dorandoran.dorandoran.core.user.dto.LoginRequest;
+import com.dorandoran.dorandoran.core.user.dto.LoginResponse;
 import com.dorandoran.dorandoran.core.user.dto.PhoneNumberAuthenticationCodeRequest;
 import com.dorandoran.dorandoran.core.user.dto.PhoneNumberAuthenticationRequest;
 import com.dorandoran.dorandoran.core.user.repository.PhoneNumberAuthenticationRepository;
+import com.dorandoran.dorandoran.core.user.repository.RefreshTokenRepository;
 import com.dorandoran.dorandoran.core.user.repository.UserRepository;
 import com.dorandoran.dorandoran.global.error.exception.BadRequestException;
+import com.dorandoran.dorandoran.global.error.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,8 +31,11 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService {
 	private final SmsService smsService;
 	private final ProfileService profileService;
+	private final TokenService tokenService;
 	private final PhoneNumberAuthenticationRepository phoneNumberAuthenticationRepository;
 	private final UserRepository userRepository;
+	private final ProfileRepository profileRepository;
+	private final RefreshTokenRepository refreshTokenRepository;
 
 	@Override
 	@Transactional
@@ -93,5 +102,40 @@ public class UserServiceImpl implements UserService {
 
 		// return
 		return AddUserResponse.ofEntity(savedUser);
+	}
+
+	@Override
+	public LoginResponse login(LoginRequest request) {
+		// find user
+		User user = userRepository.findByEmail(request.getEmail())
+			.orElseThrow(() -> new NotFoundException("user", request.getEmail().getValue()));
+
+		// check if password matches
+		if (!request.getPassword().matches(user.getPassword())) {
+			throw new BadRequestException("signIn-failed.password-missmatch");
+		}
+
+		// find profileId
+		Long profileId = profileRepository.findProfileIdByUserId(user.getId())
+			.orElseThrow(() -> new NotFoundException("profile", user.getId()));
+
+		// create token
+		String accessToken = tokenService.createAccessToken(user.getId(), profileId);
+		String refreshToken = tokenService.createRefreshToken();
+
+		// save refreshToken
+		saveRefreshToken(refreshToken, user.getId());
+
+		// create & return response
+		return new LoginResponse(accessToken, refreshToken);
+	}
+
+	private void saveRefreshToken(String refreshTokenStr, long userId) {
+		RefreshToken refreshToken = new RefreshToken(refreshTokenStr, userId);
+		refreshTokenRepository.save(refreshToken);
+	}
+
+	private void deleteRefreshToken(String refreshTokenStr) {
+		refreshTokenRepository.deleteById(refreshTokenStr);
 	}
 }

@@ -34,6 +34,20 @@ public class JwtTokenService implements TokenService {
 	}
 
 	@Override
+	public String createAccessToken(long userId, long profileId) {
+		long currentTime = (new Date()).getTime();
+		final Date accessTokenExpiresIn = new Date(currentTime + accessValidity);
+
+		return Jwts.builder()
+			.setSubject("AccessToken")
+			.claim("userId", userId)
+			.claim("profileId", profileId)
+			.setExpiration(accessTokenExpiresIn)
+			.signWith(secretKey, SignatureAlgorithm.HS512)
+			.compact();
+	}
+
+	@Override
 	public String createRefreshToken() {
 		long currentTime = (new Date()).getTime();
 		final Date refreshTokenExpiresIn = new Date(currentTime + refreshValidity);
