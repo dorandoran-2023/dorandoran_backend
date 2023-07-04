@@ -10,6 +10,8 @@ import com.dorandoran.dorandoran.core.user.dto.AddUserRequest;
 import com.dorandoran.dorandoran.core.user.dto.AddUserResponse;
 import com.dorandoran.dorandoran.core.user.dto.EmailDuplicatedCheckRequest;
 import com.dorandoran.dorandoran.core.user.dto.EmailDuplicatedCheckResponse;
+import com.dorandoran.dorandoran.core.user.dto.LoginRequest;
+import com.dorandoran.dorandoran.core.user.dto.LoginResponse;
 import com.dorandoran.dorandoran.core.user.dto.PhoneNumberAuthenticationCodeRequest;
 import com.dorandoran.dorandoran.core.user.dto.PhoneNumberAuthenticationRequest;
 
@@ -49,5 +51,12 @@ public class UserController {
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(body);
+	}
+
+	@PostMapping("/v1/login")
+	public LoginResponse login(
+		LoginRequest request
+	) {
+		return userService.login(request);
 	}
 }

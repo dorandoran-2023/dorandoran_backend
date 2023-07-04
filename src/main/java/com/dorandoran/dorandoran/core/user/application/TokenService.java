@@ -5,7 +5,8 @@ import java.util.Map;
 public interface TokenService {
 	Map<String, Object> parseClaim(String token);
 
-	//TODO - createAccessToken(Profile profile)
+	String createAccessToken(long userId, long profileId);
+
 	String createRefreshToken();
 
 	boolean isExpired(String token);
