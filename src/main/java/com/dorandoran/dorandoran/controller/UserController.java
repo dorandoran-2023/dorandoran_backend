@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dorandoran.dorandoran.core.user.application.UserService;
+import com.dorandoran.dorandoran.core.user.dto.AccessTokenCheckRequest;
+import com.dorandoran.dorandoran.core.user.dto.AccessTokenCheckResponse;
 import com.dorandoran.dorandoran.core.user.dto.AddUserRequest;
 import com.dorandoran.dorandoran.core.user.dto.AddUserResponse;
 import com.dorandoran.dorandoran.core.user.dto.EmailDuplicatedCheckRequest;
@@ -58,5 +60,12 @@ public class UserController {
 		LoginRequest request
 	) {
 		return userService.login(request);
+	}
+
+	@PostMapping("/v1/accesstoken/expired")
+	public AccessTokenCheckResponse checkTokenExpiration(
+		AccessTokenCheckRequest request
+	) {
+		return userService.checkTokenExpiration(request);
 	}
 }

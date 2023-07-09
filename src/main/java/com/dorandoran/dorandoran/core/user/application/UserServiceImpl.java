@@ -1,14 +1,21 @@
 package com.dorandoran.dorandoran.core.user.application;
 
+import java.util.Map;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dorandoran.dorandoran.core.profile.application.ProfileService;
+import com.dorandoran.dorandoran.core.profile.domain.Profile;
 import com.dorandoran.dorandoran.core.profile.repository.ProfileRepository;
 import com.dorandoran.dorandoran.core.user.domain.PhoneNumberAuthentication;
 import com.dorandoran.dorandoran.core.user.domain.RefreshToken;
 import com.dorandoran.dorandoran.core.user.domain.User;
+import com.dorandoran.dorandoran.core.user.dto.AccessTokenCheckRequest;
+import com.dorandoran.dorandoran.core.user.dto.AccessTokenCheckResponse;
+import com.dorandoran.dorandoran.core.user.dto.AccessTokenReissueRequest;
+import com.dorandoran.dorandoran.core.user.dto.AccessTokenReissueResponse;
 import com.dorandoran.dorandoran.core.user.dto.AddUserRequest;
 import com.dorandoran.dorandoran.core.user.dto.AddUserResponse;
 import com.dorandoran.dorandoran.core.user.dto.EmailDuplicatedCheckRequest;
@@ -128,6 +135,43 @@ public class UserServiceImpl implements UserService {
 
 		// create & return response
 		return new LoginResponse(accessToken, refreshToken);
+	}
+
+	@Override
+	public AccessTokenCheckResponse checkTokenExpiration(AccessTokenCheckRequest request) {
+		// check if expired
+		boolean expired = tokenService.isExpired(request.getAccessToken());
+
+		// create & return response
+		return new AccessTokenCheckResponse(expired);
+	}
+
+	@Override
+	public AccessTokenReissueResponse reissueToken(AccessTokenReissueRequest request) {
+		// check if expired
+		if (tokenService.isExpired(request.getRefreshToken())) {
+			throw new BadRequestException("token-reissue-failed.refreshToken-expired");
+		}
+
+		// find refreshToken
+		RefreshToken refreshToken = refreshTokenRepository.findById(request.getRefreshToken())
+			.orElseThrow(() -> new BadRequestException("token-reissue-failed.refreshTokne-notFound"));
+
+		// find profile & user
+		Profile profile = profileRepository.findByUserId(refreshToken.getUserId())
+			.orElseThrow(() -> new BadRequestException("token-reissue-failed.userId-notFound"));
+		User user = profile.getUser();
+
+		// access token & refresh token reissue
+		String accessToken = tokenService.createAccessToken(user.getId(), profile.getId());
+		String reissuedRefreshToken = tokenService.createRefreshToken();
+
+		// delete & save refreshToken
+		deleteRefreshToken(refreshToken.getRefreshToken());
+		saveRefreshToken(reissuedRefreshToken, user.getId());
+
+		// create & return response
+		return new AccessTokenReissueResponse(accessToken, reissuedRefreshToken);
 	}
 
 	private void saveRefreshToken(String refreshTokenStr, long userId) {

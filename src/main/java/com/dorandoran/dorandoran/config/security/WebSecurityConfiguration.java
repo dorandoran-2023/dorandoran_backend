@@ -56,7 +56,7 @@ public class WebSecurityConfiguration {
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 			.authorizeRequests(
 				authorize -> authorize
-					.antMatchers("/v1/signup/**", "/v1/login/**").permitAll()
+					.antMatchers("/v1/signup/**", "/v1/login/**", "/v1/accesstoken/**").permitAll()
 					.anyRequest().authenticated()
 			)
 			.exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))

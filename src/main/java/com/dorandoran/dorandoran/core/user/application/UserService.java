@@ -1,5 +1,9 @@
 package com.dorandoran.dorandoran.core.user.application;
 
+import com.dorandoran.dorandoran.core.user.dto.AccessTokenCheckRequest;
+import com.dorandoran.dorandoran.core.user.dto.AccessTokenCheckResponse;
+import com.dorandoran.dorandoran.core.user.dto.AccessTokenReissueRequest;
+import com.dorandoran.dorandoran.core.user.dto.AccessTokenReissueResponse;
 import com.dorandoran.dorandoran.core.user.dto.AddUserRequest;
 import com.dorandoran.dorandoran.core.user.dto.AddUserResponse;
 import com.dorandoran.dorandoran.core.user.dto.EmailDuplicatedCheckRequest;
@@ -19,4 +23,8 @@ public interface UserService {
 	AddUserResponse addUser(AddUserRequest request);
 
 	LoginResponse login(LoginRequest request);
+
+	AccessTokenCheckResponse checkTokenExpiration(AccessTokenCheckRequest request);
+
+	AccessTokenReissueResponse reissueToken(AccessTokenReissueRequest request);
 }
